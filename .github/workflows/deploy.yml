@@ -37,11 +37,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build OCI image (arm64) and export to tarball
+      - name: Build OCI image and export to tarball
         run: |
           mkdir -p payload
           docker buildx build \
-            --platform linux/arm64 \
+            --platform "${{ vars.TARGET_PLATFORM || 'linux/arm64' }}" \
             --output "type=docker,dest=payload/image.tar" \
             --tag nginx-edge:sha-${{ github.sha }} \
             app/

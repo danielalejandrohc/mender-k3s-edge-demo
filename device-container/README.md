@@ -9,7 +9,7 @@ inventory script. The container runs `--privileged` (k3s needs it).
 |----------------------------------------------------|-----------------------------------------------|
 | `customize-image.sh` / `firstrun.sh` install k3s   | `Dockerfile` downloads the k3s binary         |
 | `/data/k3s` partition                              | `k3s-data` volume                             |
-| device type `raspberrypi4_64`, arm64 images        | device type `generic-x86_64`; amd64 or arm64 (emulated) images |
+| device type `raspberrypi4_64`, arm64 images        | device type `generic-x86_64`, amd64 images    |
 | A/B rootfs OS updates                              | **not reproducible** — no bootloader or partitions |
 
 ## Offline (no Mender server)
@@ -35,8 +35,9 @@ docker compose up -d --build
 
 Accept the device (hostname `edge-docker-01`) in **Devices → Pending** and add it to a group. Then either:
 
-- **GitHub Actions**: set the variable `MENDER_DEVICE_TYPE=generic-x86_64` and push to `main`.
-  The workflow's arm64 image runs on the container through QEMU emulation.
+- **GitHub Actions**: set the variables `MENDER_DEVICE_TYPE=generic-x86_64` and
+  `TARGET_PLATFORM=linux/amd64`, then push to `main`. An arm64 image from buildx is rejected
+  by the amd64 node (`ctr: image might be filtered out`).
 - **From this machine**:
   `MENDER_TOKEN=<personal access token> MENDER_DEVICE_GROUP=<group> bash device-container/build-artifact.sh`
 
