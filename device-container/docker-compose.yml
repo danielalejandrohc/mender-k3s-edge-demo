@@ -1,0 +1,25 @@
+services:
+  edge-device:
+    build:
+      context: ..
+      dockerfile: device-container/Dockerfile
+      pull: true
+    image: mender-k3s-device
+    container_name: mender-k3s-device
+    # Fixed hostname = stable k3s node name across container recreates
+    hostname: ${DEVICE_HOSTNAME:-edge-docker-01}
+    privileged: true
+    ports:
+      - "${APP_PORT:-8080}:80"   # traefik ingress -> nginx-edge
+    environment:
+      SERVER_URL: ${SERVER_URL:-https://hosted.mender.io}
+      TENANT_TOKEN: ${TENANT_TOKEN:-}
+      STANDALONE: ${STANDALONE:-false}
+    volumes:
+      - mender-data:/var/lib/mender        # device identity key -> same device in Mender
+      - k3s-data:/var/lib/rancher/k3s      # the Pi's /data/k3s: cluster state + imported images
+    restart: unless-stopped
+
+volumes:
+  mender-data:
+  k3s-data:

@@ -1,3 +1,4 @@
 payload/
 *.mender
 output/
+device-container/.env:
